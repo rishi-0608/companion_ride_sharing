@@ -1,0 +1,254 @@
+<!-- ══════════════════════════════════════
+     PAGE: DASHBOARD (authenticated)
+══════════════════════════════════════ -->
+<div id="page-dashboard" class="page">
+  <!-- Top Navbar -->
+  <nav class="app-nav">
+    <div class="nav-brand">
+      <span class="brand-icon">🚗</span>
+      <span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" id="anl-dashboard" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" id="anl-find" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" id="anl-post" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" id="anl-myrides" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="search-bar-mini">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search destinations..." id="nav-search" oninput="navSearch()" />
+      </div>
+      <button class="icon-btn" title="Notifications"><i data-lucide="bell"></i></button>
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="user-avatar-nav">A</div>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="dropdown-name" id="dropdown-name">Alex</div>
+          <div class="dropdown-email" id="dropdown-email">alex@cb.students.amrita.edu</div>
+          <hr/>
+          <a href="#" onclick="showPage('page-myrides')"><i data-lucide="car"></i> My Rides</a>
+          <a href="#" onclick="showPage('page-settings')"><i data-lucide="settings"></i> Settings</a>
+          <hr/>
+          <a href="#" class="logout-link" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" id="sl-dashboard" onclick="showPage('page-dashboard')">
+          <i data-lucide="layout-dashboard"></i> Dashboard
+        </a>
+        <a href="#" class="sidebar-link" id="sl-myrides" onclick="showPage('page-myrides')">
+          <i data-lucide="car"></i> My Rides
+        </a>
+        <a href="#" class="sidebar-link" id="sl-payments" onclick="showSection('payments')">
+          <i data-lucide="credit-card"></i> Payments
+        </a>
+        <a href="#" class="sidebar-link" id="sl-circle" onclick="showSection('circle')">
+          <i data-lucide="users"></i> Campus Circle
+        </a>
+        <a href="#" class="sidebar-link" id="sl-settings" onclick="showPage('page-settings')">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+      <!-- Balance Card -->
+      <div class="balance-card">
+        <div class="balance-header">
+          <span>Total Savings</span>
+          <i data-lucide="info"></i>
+        </div>
+        <div class="balance-amount" id="balance-amount">₹0</div>
+        <div class="balance-note" id="balance-note">Start sharing rides to save!</div>
+        <button class="btn btn-teal btn-sm">View History</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome Header -->
+      <div class="dashboard-header">
+        <div>
+          <h1 class="welcome-title" id="welcome-title">Welcome back, Alex</h1>
+          <p class="welcome-sub" id="welcome-sub">You have 0 rides scheduled for this week.</p>
+        </div>
+        <div class="dashboard-actions">
+          <button class="btn btn-primary" onclick="showPage('page-post')">
+            <i data-lucide="plus"></i> Post a Ride
+          </button>
+          <button class="btn btn-outline" onclick="showPage('page-find')">
+            <i data-lucide="search"></i> Find a Ride
+          </button>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Upcoming Rides -->
+        <div class="dash-card upcoming-rides-card">
+          <div class="card-header">
+            <h2>Upcoming Rides</h2>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('page-myrides')">View All</button>
+          </div>
+          <div id="dash-upcoming-rides">
+            <div class="empty-state-small">
+              <i data-lucide="car"></i>
+              <p>No upcoming rides. <a href="#" onclick="showPage('page-find')">Find one!</a></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dash-right-col">
+          <!-- Recent Matches -->
+          <div class="dash-card">
+            <div class="card-header">
+              <h3>Recent Matches</h3>
+              <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+            </div>
+            <div id="dash-matches" class="matches-list">
+              <div class="match-item">
+                <div class="avatar-sm" style="background:#6366f1">J</div>
+                <div class="match-info"><div class="match-name">Jordan D.</div><div class="match-dept">Engineering Dept</div></div>
+                <button class="icon-btn"><i data-lucide="message-square"></i></button>
+              </div>
+              <div class="match-item">
+                <div class="avatar-sm" style="background:#10b981">M</div>
+                <div class="match-info"><div class="match-name">Mia Lee</div><div class="match-dept">Business School</div></div>
+                <button class="icon-btn"><i data-lucide="message-square"></i></button>
+              </div>
+              <div class="match-item">
+                <div class="avatar-sm" style="background:#f59e0b">R</div>
+                <div class="match-info"><div class="match-name">Ryan W.</div><div class="match-dept">Arts &amp; Design</div></div>
+                <button class="icon-btn"><i data-lucide="message-square"></i></button>
+              </div>
+              <button class="btn btn-outline btn-full btn-sm">Expand Network</button>
+            </div>
+          </div>
+
+          <!-- Safety Card -->
+          <div class="safety-card">
+            <i data-lucide="shield"></i>
+            <div>
+              <strong>Safety First!</strong>
+              <p>Always verify student IDs before starting your trip. Share your live location with friends.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card green">
+          <div class="stat-card-icon"><i data-lucide="piggy-bank"></i></div>
+          <div><div class="stat-card-label">Money Saved</div><div class="stat-card-val" id="stat-money">₹0</div></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-card-icon"><i data-lucide="star"></i></div>
+          <div><div class="stat-card-label">Driver Rating</div><div class="stat-card-val">4.9 / 5</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: MY RIDES
+══════════════════════════════════════ -->
+<div id="page-myrides" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link active" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="myrides-user-avatar">A</div>
+        <div class="user-dropdown" id="myrides-user-dropdown">
+          <a href="#" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="myrides-layout">
+    <div class="myrides-header">
+      <h1>My Rides</h1>
+      <button class="btn btn-primary" onclick="showPage('page-post')">
+        <i data-lucide="plus"></i> Post New Ride
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="rides-tabs">
+      <button class="tab-btn active" id="tab-posted" onclick="switchTab('posted')">
+        <i data-lucide="send"></i> Posted Rides
+      </button>
+      <button class="tab-btn" id="tab-joined" onclick="switchTab('joined')">
+        <i data-lucide="users"></i> Joined Rides
+      </button>
+    </div>
+
+    <div id="myrides-posted" class="tab-content active">
+      <div id="posted-rides-list" class="rides-results"></div>
+    </div>
+    <div id="myrides-joined" class="tab-content">
+      <div id="joined-rides-list" class="rides-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: SETTINGS
+══════════════════════════════════════ -->
+<div id="page-settings" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="settings-user-avatar">A</div>
+        <div class="user-dropdown" id="settings-user-dropdown">
+          <a href="#" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="settings-layout">
+    <h1>Settings</h1>
+    <div class="settings-card">
+      <h3>Profile Information</h3>
+      <div class="settings-row">
+        <label>Full Name</label>
+        <input type="text" id="settings-name" placeholder="Your name" />
+      </div>
+      <div class="settings-row">
+        <label>Phone</label>
+        <input type="tel" id="settings-phone" placeholder="Phone number" />
+      </div>
+      <div class="settings-row">
+        <label>Email</label>
+        <input type="email" id="settings-email" placeholder="Email" disabled />
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Changes</button>
+    </div>
+    <div class="settings-card danger-zone">
+      <h3>Account</h3>
+      <button class="btn btn-danger" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+  </div>
+</div>

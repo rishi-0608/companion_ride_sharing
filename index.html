@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Companion — Student Ride Sharing</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     TOAST NOTIFICATION CONTAINER
+══════════════════════════════════════ -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- ══════════════════════════════════════
+     PAGE: LANDING / HOME  ← index.html
+══════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+  <!-- Navbar -->
+  <nav class="nav-landing">
+    <div class="nav-brand">
+      <span class="brand-icon">🚗</span>
+      <span class="brand-name">Companion</span>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link" onclick="showPage('page-find-public')">Find Rides</a>
+      <a href="#" class="nav-link" onclick="requireAuth('page-post')">Post a Ride</a>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-ghost" onclick="showPage('page-login')">Log In</button>
+      <button class="btn btn-primary" onclick="showPage('page-signup')">Sign Up</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Verified Amrita Students Only
+      </div>
+      <h1 class="hero-title">Share Rides,<br>Split Costs,<br><span class="gradient-text">Meet Students.</span></h1>
+      <p class="hero-sub">The exclusive carpooling network for Amrita CB students. Secure, verified, and built for the campus hustle.</p>
+
+      <!-- Quick Search -->
+      <div class="hero-search-card">
+        <div class="search-input-group">
+          <div class="search-input-wrap">
+            <i data-lucide="map-pin" class="search-icon"></i>
+            <input type="text" id="hero-from" placeholder="From Campus" />
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-input-wrap">
+            <i data-lucide="navigation" class="search-icon"></i>
+            <input type="text" id="hero-to" placeholder="Where to?" />
+          </div>
+          <button class="btn btn-primary search-btn" onclick="heroSearch()">
+            <i data-lucide="search"></i> Find a Ride
+          </button>
+        </div>
+        <div class="hero-actions-row">
+          <button class="btn btn-outline" onclick="requireAuth('page-post')">
+            <i data-lucide="plus-circle"></i> Post a Ride
+          </button>
+          <div class="riding-today">
+            <div class="avatar-stack">
+              <div class="avatar-sm" style="background:#6366f1">A</div>
+              <div class="avatar-sm" style="background:#10b981">B</div>
+              <div class="avatar-sm" style="background:#f59e0b">C</div>
+            </div>
+            <span>4.2k students riding today</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img-card">
+        <div class="hero-img-placeholder">
+          <div class="car-illustration">
+            <div class="car-body">🚗</div>
+            <div class="students-row">
+              <div class="student-avatar">👩‍🎓</div>
+              <div class="student-avatar">👨‍🎓</div>
+              <div class="student-avatar">👩‍🎓</div>
+            </div>
+          </div>
+        </div>
+        <div class="verified-badge-float">
+          <i data-lucide="shield-check"></i>
+          <div>
+            <div class="vbf-title">Verified Student</div>
+            <div class="vbf-sub">Sarah joined 15 minutes ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <h2 class="section-title">Built for the Academic Community</h2>
+    <p class="section-sub">Experience travel that fits your schedule, your budget, and your safety standards.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon teal"><i data-lucide="shield"></i></div>
+        <h3>Verified Profiles</h3>
+        <p>Every member must verify their Amrita email. Travel with peace of mind knowing your driver is a fellow student.</p>
+        <span class="feature-tag">EDU ONLY</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon orange"><i data-lucide="split-square-horizontal"></i></div>
+        <h3>Easy Fare Splitting</h3>
+        <p>No awkward math. Our system calculates and manages fare splits automatically between riders and drivers.</p>
+        <span class="feature-tag live"><span class="live-dot"></span>Live Fare Tracking</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon blue"><i data-lucide="zap"></i></div>
+        <h3>Campus Velocity</h3>
+        <p>Reduce the campus carbon footprint. Fewer cars, more shared rides, and faster transit for everyone.</p>
+        <span class="feature-tag">Campus Transit App</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Upcoming Rides Preview -->
+  <section class="upcoming-section">
+    <div class="upcoming-header">
+      <div>
+        <div class="available-label">AVAILABLE NOW</div>
+        <h2>Upcoming Rides Today</h2>
+      </div>
+      <button class="btn btn-ghost" onclick="requireAuth('page-find')">View all departures →</button>
+    </div>
+    <div id="landing-rides-preview" class="landing-rides-grid">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="stats-bar">
+    <div class="stat-item"><div class="stat-num">50k+</div><div class="stat-label">STUDENT TRIPS</div></div>
+    <div class="stat-item"><div class="stat-num">120+</div><div class="stat-label">COLLEGES</div></div>
+    <div class="stat-item"><div class="stat-num">₹4L+</div><div class="stat-label">FARES SAVED</div></div>
+    <div class="stat-item"><div class="stat-num">4.9/5</div><div class="stat-label">STUDENT RATING</div></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-brand">
+      <span class="brand-icon">🚗</span>
+      <span class="brand-name">Companion</span>
+      <div class="footer-copy">© 2025 Companion. Verified Student Transit.</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">Safety Guidelines</a>
+      <a href="#">Fare Splitting</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Help Center</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     PARTIAL LOADER
+     Injects auth.html, dashboard.html, rides.html
+     into the DOM before script.js initialises.
+══════════════════════════════════════ -->
+<script>
+  ['auth.html', 'dashboard.html', 'rides.html'].forEach(function(file) {
+    document.body.insertAdjacentHTML('beforeend', window.electronAPI.readPartial(file));
+  });
+</script>
+
+<!-- ══════════════════════════════════════
+     PAGE: SIGNUP  ← auth.html
+══════════════════════════════════════ -->
+<div id="page-signup" class="page">
+  <div class="auth-layout">
+    <div class="auth-visual">
+      <div class="auth-visual-content">
+        <span class="brand-icon-lg">🚗</span>
+        <h2>Join Companion</h2>
+        <p>Connect with verified Amrita students for safe, affordable rides.</p>
+        <ul class="auth-perks">
+          <li><i data-lucide="check-circle"></i> Verified @cb.students.amrita.edu emails</li>
+          <li><i data-lucide="check-circle"></i> Automatic fare splitting</li>
+          <li><i data-lucide="check-circle"></i> Safe campus community</li>
+        </ul>
+      </div>
+    </div>
+    <div class="auth-form-panel">
+      <div class="auth-form-wrap">
+        <div class="auth-header">
+          <h1>Create Account</h1>
+          <p>Already have an account? <a href="#" onclick="showPage('page-login')">Log in</a></p>
+        </div>
+        <form id="signup-form" onsubmit="handleSignup(event)" novalidate>
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <div class="input-wrap">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="signup-name" placeholder="Your full name" autocomplete="name" required />
+            </div>
+            <span class="field-error" id="err-name"></span>
+          </div>
+          <div class="form-group">
+            <label for="signup-phone">Phone Number</label>
+            <div class="input-wrap">
+              <i data-lucide="phone" class="input-icon"></i>
+              <input type="tel" id="signup-phone" placeholder="10-digit mobile number" autocomplete="tel" required />
+            </div>
+            <span class="field-error" id="err-phone"></span>
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Amrita Email ID</label>
+            <div class="input-wrap">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" id="signup-email" placeholder="yourname@cb.students.amrita.edu" autocomplete="email" required />
+            </div>
+            <span class="field-error" id="err-email"></span>
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <div class="input-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="signup-password" placeholder="Minimum 6 characters" autocomplete="new-password" required />
+              <button type="button" class="toggle-pw" onclick="togglePassword('signup-password', this)">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+            <span class="field-error" id="err-password"></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <i data-lucide="user-plus"></i> Create Account
+          </button>
+        </form>
+        <button class="btn btn-ghost btn-back" onclick="showPage('page-landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: LOGIN
+══════════════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="auth-layout">
+    <div class="auth-visual">
+      <div class="auth-visual-content">
+        <span class="brand-icon-lg">🚗</span>
+        <h2>Welcome Back</h2>
+        <p>Your campus rides are waiting. Log in to continue your journey.</p>
+        <ul class="auth-perks">
+          <li><i data-lucide="check-circle"></i> View your upcoming rides</li>
+          <li><i data-lucide="check-circle"></i> Post or find new rides</li>
+          <li><i data-lucide="check-circle"></i> Track fare splits</li>
+        </ul>
+      </div>
+    </div>
+    <div class="auth-form-panel">
+      <div class="auth-form-wrap">
+        <div class="auth-header">
+          <h1>Log In</h1>
+          <p>Don't have an account? <a href="#" onclick="showPage('page-signup')">Sign up</a></p>
+        </div>
+        <form id="login-form" onsubmit="handleLogin(event)" novalidate>
+          <div class="form-group">
+            <label for="login-email">Amrita Email / Name</label>
+            <div class="input-wrap">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="text" id="login-email" placeholder="Email or full name" autocomplete="email" required />
+            </div>
+            <span class="field-error" id="err-login-email"></span>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" required />
+              <button type="button" class="toggle-pw" onclick="togglePassword('login-password', this)">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+            <span class="field-error" id="err-login-password"></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <i data-lucide="log-in"></i> Log In
+          </button>
+        </form>
+        <button class="btn btn-ghost btn-back" onclick="showPage('page-landing')">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: DASHBOARD (authenticated)
+══════════════════════════════════════ -->
+<div id="page-dashboard" class="page">
+  <!-- Top Navbar -->
+  <nav class="app-nav">
+    <div class="nav-brand">
+      <span class="brand-icon">🚗</span>
+      <span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" id="anl-dashboard" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" id="anl-find" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" id="anl-post" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" id="anl-myrides" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="search-bar-mini">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search destinations..." id="nav-search" oninput="navSearch()" />
+      </div>
+      <button class="icon-btn" title="Notifications"><i data-lucide="bell"></i></button>
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="user-avatar-nav">A</div>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="dropdown-name" id="dropdown-name">Alex</div>
+          <div class="dropdown-email" id="dropdown-email">alex@cb.students.amrita.edu</div>
+          <hr/>
+          <a href="#" onclick="showPage('page-myrides')"><i data-lucide="car"></i> My Rides</a>
+          <a href="#" onclick="showPage('page-settings')"><i data-lucide="settings"></i> Settings</a>
+          <hr/>
+          <a href="#" class="logout-link" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" id="sl-dashboard" onclick="showPage('page-dashboard')">
+          <i data-lucide="layout-dashboard"></i> Dashboard
+        </a>
+        <a href="#" class="sidebar-link" id="sl-myrides" onclick="showPage('page-myrides')">
+          <i data-lucide="car"></i> My Rides
+        </a>
+        <a href="#" class="sidebar-link" id="sl-payments" onclick="showSection('payments')">
+          <i data-lucide="credit-card"></i> Payments
+        </a>
+        <a href="#" class="sidebar-link" id="sl-circle" onclick="showSection('circle')">
+          <i data-lucide="users"></i> Campus Circle
+        </a>
+        <a href="#" class="sidebar-link" id="sl-settings" onclick="showPage('page-settings')">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+      <!-- Balance Card -->
+      <div class="balance-card">
+        <div class="balance-header">
+          <span>Total Savings</span>
+          <i data-lucide="info"></i>
+        </div>
+        <div class="balance-amount" id="balance-amount">₹0</div>
+        <div class="balance-note" id="balance-note">Start sharing rides to save!</div>
+        <button class="btn btn-teal btn-sm">View History</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome Header -->
+      <div class="dashboard-header">
+        <div>
+          <h1 class="welcome-title" id="welcome-title">Welcome back, Alex</h1>
+          <p class="welcome-sub" id="welcome-sub">You have 0 rides scheduled for this week.</p>
+        </div>
+        <div class="dashboard-actions">
+          <button class="btn btn-primary" onclick="showPage('page-post')">
+            <i data-lucide="plus"></i> Post a Ride
+          </button>
+          <button class="btn btn-outline" onclick="showPage('page-find')">
+            <i data-lucide="search"></i> Find a Ride
+          </button>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Upcoming Rides -->
+        <div class="dash-card upcoming-rides-card">
+          <div class="card-header">
+            <h2>Upcoming Rides</h2>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('page-myrides')">View All</button>
+          </div>
+          <div id="dash-upcoming-rides">
+            <div class="empty-state-small">
+              <i data-lucide="car"></i>
+              <p>No upcoming rides. <a href="#" onclick="showPage('page-find')">Find one!</a></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dash-right-col">
+          <!-- Recent Matches -->
+          <div class="dash-card">
+            <div class="card-header">
+              <h3>Recent Matches</h3>
+              <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+            </div>
+            <div id="dash-matches" class="matches-list">
+              <div class="match-item">
+                <div class="avatar-sm" style="background:#6366f1">J</div>
+                <div class="match-info"><div class="match-name">Jordan D.</div><div class="match-dept">Engineering Dept</div></div>
+                <button class="icon-btn"><i data-lucide="message-square"></i></button>
+              </div>
+              <div class="match-item">
+                <div class="avatar-sm" style="background:#10b981">M</div>
+                <div class="match-info"><div class="match-name">Mia Lee</div><div class="match-dept">Business School</div></div>
+                <button class="icon-btn"><i data-lucide="message-square"></i></button>
+              </div>
+              <div class="match-item">
+                <div class="avatar-sm" style="background:#f59e0b">R</div>
+                <div class="match-info"><div class="match-name">Ryan W.</div><div class="match-dept">Arts &amp; Design</div></div>
+                <button class="icon-btn"><i data-lucide="message-square"></i></button>
+              </div>
+              <button class="btn btn-outline btn-full btn-sm">Expand Network</button>
+            </div>
+          </div>
+
+          <!-- Safety Card -->
+          <div class="safety-card">
+            <i data-lucide="shield"></i>
+            <div>
+              <strong>Safety First!</strong>
+              <p>Always verify student IDs before starting your trip. Share your live location with friends.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card green">
+          <div class="stat-card-icon"><i data-lucide="piggy-bank"></i></div>
+          <div><div class="stat-card-label">Money Saved</div><div class="stat-card-val" id="stat-money">₹0</div></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-card-icon"><i data-lucide="star"></i></div>
+          <div><div class="stat-card-label">Driver Rating</div><div class="stat-card-val">4.9 / 5</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: FIND A RIDE (authenticated)
+══════════════════════════════════════ -->
+<div id="page-find" class="page">
+  <!-- Reuse app-nav via JS -->
+  <nav class="app-nav" id="find-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link active" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <button class="icon-btn" title="Notifications"><i data-lucide="bell"></i></button>
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="find-user-avatar">A</div>
+        <div class="user-dropdown" id="find-user-dropdown">
+          <a href="#" onclick="showPage('page-myrides')"><i data-lucide="car"></i> My Rides</a>
+          <a href="#" onclick="showPage('page-settings')"><i data-lucide="settings"></i> Settings</a>
+          <hr/>
+          <a href="#" class="logout-link" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Search Bar -->
+  <div class="find-search-bar">
+    <div class="find-search-inner">
+      <div class="find-input-wrap">
+        <i data-lucide="map-pin" class="search-icon-sm"></i>
+        <input type="text" id="find-from" placeholder="From" />
+      </div>
+      <div class="find-input-wrap">
+        <i data-lucide="navigation" class="search-icon-sm"></i>
+        <input type="text" id="find-to" placeholder="To" />
+      </div>
+      <div class="find-input-wrap">
+        <i data-lucide="calendar" class="search-icon-sm"></i>
+        <input type="date" id="find-date" />
+      </div>
+      <button class="btn btn-primary" onclick="searchRides()">
+        <i data-lucide="search"></i> Update Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Area -->
+  <div class="find-layout">
+    <!-- Filters Sidebar -->
+    <aside class="filters-sidebar">
+      <div class="filters-header"><i data-lucide="sliders-horizontal"></i> Filters</div>
+      <div class="filter-group">
+        <div class="filter-group-title">VEHICLE TYPE</div>
+        <label class="filter-check"><input type="checkbox" id="f-car" checked /> Car</label>
+        <label class="filter-check"><input type="checkbox" id="f-bike" checked /> Bike</label>
+        <label class="filter-check"><input type="checkbox" id="f-auto" checked /> Auto</label>
+        <label class="filter-check"><input type="checkbox" id="f-van" checked /> Van/Cab</label>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-title">SEATS AVAILABLE</div>
+        <label class="filter-check"><input type="checkbox" id="f-s1" checked /> 1+</label>
+        <label class="filter-check"><input type="checkbox" id="f-s2" checked /> 2+</label>
+        <label class="filter-check"><input type="checkbox" id="f-s3" checked /> 3+</label>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-title">MAX FARE (₹)</div>
+        <input type="range" id="fare-range" min="0" max="5000" value="5000" oninput="updateFareLabel(this.value)" />
+        <div class="fare-label">Up to ₹<span id="fare-label-val">5000</span></div>
+      </div>
+      <div class="safety-card-small">
+        <i data-lucide="shield-check"></i>
+        <div>
+          <strong>Safety Guaranteed</strong>
+          <p>All drivers are verified using Amrita emails and campus ID checks.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Rides List -->
+    <div class="rides-list-area">
+      <div class="rides-list-header">
+        <h2>Available Rides <span id="ride-count" class="ride-count-badge">0 found</span></h2>
+        <div class="sort-wrap">
+          Sort by:
+          <select id="sort-rides" onchange="searchRides()">
+            <option value="time">Earliest First</option>
+            <option value="fare">Lowest Fare</option>
+            <option value="seats">Most Seats</option>
+          </select>
+        </div>
+      </div>
+      <div id="rides-results" class="rides-results">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: FIND RIDE (public/landing)
+══════════════════════════════════════ -->
+<div id="page-find-public" class="page">
+  <nav class="nav-landing">
+    <div class="nav-brand" onclick="showPage('page-landing')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active">Find Rides</a>
+      <a href="#" class="nav-link" onclick="requireAuth('page-post')">Post a Ride</a>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-ghost" onclick="showPage('page-login')">Log In</button>
+      <button class="btn btn-primary" onclick="showPage('page-signup')">Sign Up</button>
+    </div>
+  </nav>
+  <div class="find-search-bar">
+    <div class="find-search-inner">
+      <div class="find-input-wrap">
+        <i data-lucide="map-pin" class="search-icon-sm"></i>
+        <input type="text" id="pub-find-from" placeholder="From" />
+      </div>
+      <div class="find-input-wrap">
+        <i data-lucide="navigation" class="search-icon-sm"></i>
+        <input type="text" id="pub-find-to" placeholder="To" />
+      </div>
+      <button class="btn btn-primary" onclick="showPage('page-signup'); showToast('Sign up to search and book rides!', 'info')">
+        <i data-lucide="search"></i> Find a Ride
+      </button>
+    </div>
+  </div>
+  <div class="public-rides-wrapper">
+    <h2>Available Rides</h2>
+    <div id="pub-rides-list" class="rides-results"></div>
+    <div class="signup-cta-banner">
+      <i data-lucide="lock"></i>
+      <p>Sign up to book seats and join rides!</p>
+      <button class="btn btn-primary" onclick="showPage('page-signup')">Create Free Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: POST A RIDE
+══════════════════════════════════════ -->
+<div id="page-post" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link active" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="post-user-avatar">A</div>
+        <div class="user-dropdown" id="post-user-dropdown">
+          <a href="#" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="post-ride-layout">
+    <div class="post-ride-form-wrap">
+      <div class="post-ride-header">
+        <h1>Post a Ride</h1>
+        <p>Share your journey and help fellow students while splitting the cost.</p>
+      </div>
+      <form id="post-ride-form" onsubmit="handlePostRide(event)" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pr-from">Starting Location</label>
+            <div class="input-wrap">
+              <i data-lucide="map-pin" class="input-icon"></i>
+              <input type="text" id="pr-from" placeholder="e.g. Amrita Campus Gate" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pr-to">Destination</label>
+            <div class="input-wrap">
+              <i data-lucide="navigation" class="input-icon"></i>
+              <input type="text" id="pr-to" placeholder="e.g. Coimbatore Railway Station" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pr-date">Date</label>
+            <div class="input-wrap">
+              <i data-lucide="calendar" class="input-icon"></i>
+              <input type="date" id="pr-date" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pr-time">Time</label>
+            <div class="input-wrap">
+              <i data-lucide="clock" class="input-icon"></i>
+              <input type="time" id="pr-time" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pr-seats">Available Seats</label>
+            <div class="input-wrap">
+              <i data-lucide="users" class="input-icon"></i>
+              <input type="number" id="pr-seats" placeholder="e.g. 3" min="1" max="8" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pr-vehicle">Vehicle Type</label>
+            <div class="input-wrap">
+              <i data-lucide="car" class="input-icon"></i>
+              <select id="pr-vehicle" required>
+                <option value="">Select vehicle type</option>
+                <option value="Car">Car</option>
+                <option value="Bike">Bike</option>
+                <option value="Auto">Auto Rickshaw</option>
+                <option value="Van">Van / Cab</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pr-fare">Total Fare (₹)</label>
+            <div class="input-wrap">
+              <i data-lucide="indian-rupee" class="input-icon"></i>
+              <input type="number" id="pr-fare" placeholder="e.g. 200" min="0" required oninput="updateFarePreview()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pr-contact">Contact Number</label>
+            <div class="input-wrap">
+              <i data-lucide="phone" class="input-icon"></i>
+              <input type="tel" id="pr-contact" placeholder="Your phone number" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Fare Preview Card -->
+        <div class="fare-preview-card" id="fare-preview">
+          <div class="fare-preview-header">
+            <i data-lucide="split-square-horizontal"></i>
+            <strong>Fare Split Preview</strong>
+          </div>
+          <div class="fare-preview-details">
+            <div class="fare-row"><span>Total Fare</span><span id="fp-total">₹0</span></div>
+            <div class="fare-row"><span>Available Seats</span><span id="fp-seats">0</span></div>
+            <div class="fare-row highlight"><span>Per Person</span><span id="fp-per">₹0</span></div>
+          </div>
+          <p class="fare-note">Final fare may be lower if more students join before departure.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          <i data-lucide="send"></i> Post Ride
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: MY RIDES
+══════════════════════════════════════ -->
+<div id="page-myrides" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link active" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="myrides-user-avatar">A</div>
+        <div class="user-dropdown" id="myrides-user-dropdown">
+          <a href="#" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="myrides-layout">
+    <div class="myrides-header">
+      <h1>My Rides</h1>
+      <button class="btn btn-primary" onclick="showPage('page-post')">
+        <i data-lucide="plus"></i> Post New Ride
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="rides-tabs">
+      <button class="tab-btn active" id="tab-posted" onclick="switchTab('posted')">
+        <i data-lucide="send"></i> Posted Rides
+      </button>
+      <button class="tab-btn" id="tab-joined" onclick="switchTab('joined')">
+        <i data-lucide="users"></i> Joined Rides
+      </button>
+    </div>
+
+    <div id="myrides-posted" class="tab-content active">
+      <div id="posted-rides-list" class="rides-results"></div>
+    </div>
+    <div id="myrides-joined" class="tab-content">
+      <div id="joined-rides-list" class="rides-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: RIDE DETAIL
+══════════════════════════════════════ -->
+<div id="page-ride-detail" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link active" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="detail-user-avatar">A</div>
+        <div class="user-dropdown" id="detail-user-dropdown">
+          <a href="#" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="ride-detail-layout">
+    <!-- Left: Map + Info -->
+    <div class="ride-detail-left">
+      <div class="ride-map-placeholder">
+        <div class="map-illustration">
+          <div class="map-pin-start"><i data-lucide="map-pin"></i></div>
+          <div class="map-route-line"></div>
+          <div class="map-pin-end"><i data-lucide="flag"></i></div>
+        </div>
+        <div class="verified-transit-badge">
+          <i data-lucide="shield-check"></i> Verified Student Transit
+        </div>
+      </div>
+
+      <div class="ride-detail-info">
+        <div class="rdi-title-row">
+          <h2 id="rd-title">Campus to Downtown</h2>
+          <div class="rdi-fare">
+            <span id="rd-fare">₹0</span>
+            <span class="per-seat-label">per seat • <span id="rd-seats-left">0</span> available</span>
+          </div>
+        </div>
+        <div class="rdi-meta">
+          <i data-lucide="calendar"></i>
+          <span id="rd-datetime">-</span>
+        </div>
+        <div class="rdi-route">
+          <div class="route-stop start">
+            <div class="route-dot filled"></div>
+            <div><strong id="rd-from">-</strong><span id="rd-from-note">Pickup Point</span></div>
+          </div>
+          <div class="route-line-v"></div>
+          <div class="route-stop end">
+            <div class="route-dot"></div>
+            <div><strong id="rd-to">-</strong><span id="rd-to-note">Drop-off Point</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmed Students -->
+      <div class="confirmed-students-card">
+        <h3>Confirmed Students</h3>
+        <div id="confirmed-students-list" class="confirmed-list"></div>
+      </div>
+    </div>
+
+    <!-- Right: Driver + Fare -->
+    <div class="ride-detail-right">
+      <!-- Driver Card -->
+      <div class="driver-card">
+        <div class="driver-info">
+          <div class="driver-avatar" id="rd-driver-avatar">D</div>
+          <div>
+            <div class="driver-name" id="rd-driver-name">Driver</div>
+            <div class="driver-rating"><i data-lucide="star"></i> <span id="rd-driver-rating">4.9</span> (42 rides)</div>
+            <span class="driver-tag" id="rd-driver-tag">Verified Student</span>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-full" onclick="showToast('Message feature coming soon!', 'info')">
+          <i data-lucide="message-square"></i> Message Driver
+        </button>
+      </div>
+
+      <!-- Fare Breakdown -->
+      <div class="fare-breakdown-card">
+        <h3>Fare Breakdown</h3>
+        <div class="fb-row"><span>Base Fare</span><span id="fb-base">₹0</span></div>
+        <div class="fb-row"><span>Split Among</span><span id="fb-split-count">1 person</span></div>
+        <div class="fb-divider"></div>
+        <div class="fb-row total"><span>Your Share</span><span id="fb-total" class="fare-highlight">₹0</span></div>
+        <div class="fb-note">
+          <i data-lucide="info"></i>
+          Final fare may be lower if more students join this ride before departure.
+        </div>
+        <button class="btn btn-primary btn-full btn-lg" id="join-ride-btn" onclick="joinCurrentRide()">
+          Join Ride <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Safety Card -->
+      <div class="safety-card-detail">
+        <i data-lucide="shield"></i>
+        <div>
+          <strong>Ride Safety Guarantee</strong>
+          <p>All drivers are identity-verified and currently enrolled students. Real-time GPS tracking is active for this trip.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: SETTINGS
+══════════════════════════════════════ -->
+<div id="page-settings" class="page">
+  <nav class="app-nav">
+    <div class="nav-brand" onclick="showPage('page-dashboard')">
+      <span class="brand-icon">🚗</span><span class="brand-name">Companion</span>
+    </div>
+    <div class="app-nav-links">
+      <a href="#" class="app-nav-link" onclick="showPage('page-dashboard')">Dashboard</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-find')">Find Rides</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-post')">Post a Ride</a>
+      <a href="#" class="app-nav-link" onclick="showPage('page-myrides')">My Rides</a>
+    </div>
+    <div class="app-nav-user">
+      <div class="user-menu" onclick="toggleUserMenu()">
+        <div class="user-avatar-nav" id="settings-user-avatar">A</div>
+        <div class="user-dropdown" id="settings-user-dropdown">
+          <a href="#" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="settings-layout">
+    <h1>Settings</h1>
+    <div class="settings-card">
+      <h3>Profile Information</h3>
+      <div class="settings-row">
+        <label>Full Name</label>
+        <input type="text" id="settings-name" placeholder="Your name" />
+      </div>
+      <div class="settings-row">
+        <label>Phone</label>
+        <input type="tel" id="settings-phone" placeholder="Phone number" />
+      </div>
+      <div class="settings-row">
+        <label>Email</label>
+        <input type="email" id="settings-email" placeholder="Email" disabled />
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Changes</button>
+    </div>
+    <div class="settings-card danger-zone">
+      <h3>Account</h3>
+      <button class="btn btn-danger" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL: CONFIRMATION
+══════════════════════════════════════ -->
+<div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-icon" id="modal-icon">✅</div>
+    <h2 id="modal-title">Success!</h2>
+    <p id="modal-body">Your action was successful.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="modal-primary-btn" onclick="closeModal()">OK</button>
+      <button class="btn btn-ghost" id="modal-secondary-btn" onclick="closeModal()" style="display:none">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

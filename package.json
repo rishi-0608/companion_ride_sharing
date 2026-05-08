@@ -1,0 +1,16 @@
+{
+  "name": "companion",
+  "version": "1.0.0",
+  "description": "Companion - Ride Sharing App for Amrita Students",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": ["ride-sharing", "amrita", "students", "electron"],
+  "author": "Companion",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0"
+  }
+}
